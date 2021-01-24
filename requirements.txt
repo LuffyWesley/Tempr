@@ -1,0 +1,6 @@
+# For sentiment analysis
+vaderSentiment
+
+# For Speech to Text (NLP)
+SpeechRecognition
+PyAudio
