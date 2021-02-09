@@ -4,3 +4,6 @@ vaderSentiment
 # For Speech to Text (NLP)
 SpeechRecognition
 PyAudio
+
+# Azure SQL DB
+pyodbc

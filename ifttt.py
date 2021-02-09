@@ -11,8 +11,7 @@ while True:
         color = 'green'
     else: # neutral sentiment
         color = 'yellow'
-
     # IFTTT webhook
     url = 'https://maker.ifttt.com/trigger/{}/with/key/NzX9u8NuVPaFWZyqQRhlv'.format(color)
     urllib.request.urlopen(url)
-    time.sleep(60) # timer for 60 secs
+    time.sleep(10) # timer for 10 secs

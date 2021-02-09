@@ -21,4 +21,4 @@ with sr.Microphone() as source:
         sentences.append(capture)
         print("Text:" + capture)
     except:
-        print("Sorry, I did not get that")    
+        print("Sorry, I did not get that")  
