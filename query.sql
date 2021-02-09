@@ -1,0 +1,1 @@
+SELECT Name, Quantity FROM test
