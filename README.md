@@ -9,7 +9,7 @@ pip install -r requirements.txt
 ```
 ## Run code on terminal/command line
 ```
-python3 database.py.py
+python3 database.py
 ```
 ## File purpose
 | File | Purpose |
