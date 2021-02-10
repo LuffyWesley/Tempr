@@ -19,7 +19,7 @@ cursor.execute("CREATE TABLE test2 (speech NVARCHAR(MAX), pos FLOAT(53), compoun
 print("Finished creating table.")
 
 # Insert some data into table
-cursor.execute("INSERT INTO test2 (speech, pos, compound, neu, neg, , color, creationTime) VALUES (?, ?, ?, ?, ?, ?, GETDATE());", (speech.capture, sentiment.vs['pos'], sentiment.vs['compound'], sentiment.vs['neu'], sentiment.vs['neg'], ifttt.color))
+cursor.execute("INSERT INTO test2 (speech, pos, compound, neu, neg, color, creationTime) VALUES (?, ?, ?, ?, ?, ?, GETDATE());", (speech.capture, sentiment.vs['pos'], sentiment.vs['compound'], sentiment.vs['neu'], sentiment.vs['neg'], ifttt.color))
 print("Inserted",cursor.rowcount,"row(s) of data.")
 
 # Cleanup
