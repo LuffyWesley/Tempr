@@ -9,5 +9,13 @@ pip install -r requirements.txt
 ```
 ## Run code on terminal/command line
 ```
-python3 sentiment.py
+python3 database.py.py
 ```
+## File purpose
+| File | Purpose |
+|:-----|:--------|
+| speech.py | Hosts code to translate speech into text. Uses Google Speech-to-Text API |
+| sentiment.py | Hosts code for sentiment analysis of the text |
+| ifttt.py | Hosts code that triggers events through IFTTT |
+| database.py | Hosts code that sends all the data to Azure SQL DB |
+| query.sql | SQL file to query through our DB |
