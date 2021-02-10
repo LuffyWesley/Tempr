@@ -1,1 +1,1 @@
-SELECT Name, Quantity FROM test
+SELECT Speech, Pos, Compound, Neu, Neg, CreationTime FROM test2
