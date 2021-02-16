@@ -7,3 +7,6 @@ PyAudio
 
 # Azure SQL DB
 pyodbc
+
+# Azure Web App
+Flask>=1.0,<=1.1.2

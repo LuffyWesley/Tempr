@@ -1,1 +1,1 @@
-SELECT Speech, Pos, Compound, Neu, Neg, CreationTime FROM test2
+SELECT * FROM test2
