@@ -1,12 +1,20 @@
 # Tempr
 ## Statement of Problem
-Aggressive behavior triggered by stressful situations in which people have little to no control can be very difficult to mediate. Aggression is known to cause feelings of irritability and restlessness, and it can be helpful and beneficial for people to recognize the state of anger they are in. Particularly with quarantine and COVID-19, people have been much more actively playing video games as a means to spend time with friends and family (or other online players). However, "toxicity" or gamer aggression, is also on the rise. This increased aggression can impact an individual's mood, relationships, and can carry on post-gaming sessions. It can be incredibly valuable to create an inexpensive tool that can recognize these anger levels and gently make the user aware of their mental state. The tool can then implement light color therapy in order to help the user cool down and verbally suggest they take a short break from the activity.
+Cyberbullying during multiplayer video game sessions leads to negative impacts in adolescents like lower self-esteem, poor grades, and poor relational patterns. Unfortunately, cyberbullying has been on the rise now more than ever due to COVID-19 drawing more kids to digital platforms for extended periods of time.
+
+![](images/among.png)
+
+![](images/example.png)
 ## Design Objectives
-It can be incredibly valuable to create an inexpensive tool that can recognize these anger levels and gently make the user aware of their mental state. The tool can then implement light color therapy in order to help the user cool down and verbally or visually suggest they take a short break from the activity, or other feedback depending on context (gaming, driving, heated discussions among couples, childcare, etc.).
-## Install dependencies
+It would be valuable to create an inexpensive tool that recognizes anger levels and gently brings awareness to the user of their mental state. The tool would implement light color therapy in order to help the user cool down while verbally or visually suggesting they take a short break from the activity, or other feedback depending on context (gaming, driving, heated discussions among couples, childcare, etc.). 
+## Install dependencies Mac/PC (testing purposes)
 ```
-pip install -r requirements.txt 
+pip3 install vaderSentiment (for sentiment)
+pip3 install SpeechRecognition (for speech-to-text)
+pip3 install pyaudio (for audio)
+pip3 install pyodbc (for DB connection)
 ```
+Follow the following instructions to [Download ODBC Driver for SQL Server](https://docs.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server?view=sql-server-ver15)
 ## Run code on terminal/command line
 ```
 python3 database.py
@@ -19,3 +27,14 @@ python3 database.py
 | ifttt.py | Hosts code that triggers events through IFTTT |
 | database.py | Hosts code that sends all the data to Azure SQL DB |
 | query.sql | SQL file to query through our DB |
+
+##  Raspberry PI 4 Setup
+### For Speech & Sentiment
+```
+pip3 install SpeechRecognition
+sudo apt-get install python-pyaudio python3-pyaudio
+pip3 install pyaudio
+sudo apt-get install flac
+python -m speech_recognition (test mic)
+```
+### Connecting Raspberry Pi to Microsoft Azure with Python3
