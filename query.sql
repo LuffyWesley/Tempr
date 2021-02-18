@@ -1,1 +1,2 @@
 SELECT * FROM test2
+SELECT * FROM test
