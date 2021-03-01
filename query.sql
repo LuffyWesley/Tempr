@@ -1,2 +1,3 @@
-SELECT * FROM test2
-SELECT * FROM test
+-- Query to see everything in the tables
+SELECT * FROM test;
+SELECT * FROM test2;
