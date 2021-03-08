@@ -1,10 +1,12 @@
 import pyodbc
-import ifttt
+# import ifttt
 import sentiment
 import speech
 import time
 import random
 import string
+import datetime
+import urllib.request
 
 server = ''
 database = ''
@@ -30,19 +32,105 @@ length_of_string = 3
 random_string = "".join(random.choice(string.ascii_letters) for i in range(length_of_string))
 random_identifier = random_string + str(seconds)
 
+# Power on (slow fade from off to green, duration 5 seconds)
+url = 'https://maker.ifttt.com/trigger/{}/with/key/NzX9u8NuVPaFWZyqQRhlv'.format(power_on)
+urllib.request.urlopen(url)   
+
 # Un-comment to drop previous table of same name if one exists
+# cursor.execute("DROP TABLE IF EXISTS list;")
+# cursor.execute("DROP TABLE IF EXISTS test;")
 # cursor.execute("DROP TABLE IF EXISTS test2;")
 # print("Finished dropping table (if existed).")
 
 # Un-comment to create table
+# cursor.execute("CREATE TABLE list (curse_words NVARCHAR(MAX), time_allowance INT, curse_threshold INT, creationTime smalldatetime)")
+# cursor.execute("CREATE TABLE test (speech NVARCHAR(MAX), pos FLOAT(53), compound FLOAT(53), neu FLOAT(53), neg FLOAT(53), color VARCHAR(50), creationTime smalldatetime)")
 # cursor.execute("CREATE TABLE test2 (identifier NVARCHAR(MAX), speech NVARCHAR(MAX), pos FLOAT(53), compound FLOAT(53), neu FLOAT(53), neg FLOAT(53), color VARCHAR(50), creationTime smalldatetime)")
 # print("Finished creating table.")
 
 # Insert some data into table
-cursor.execute("INSERT INTO test2 (identifier, speech, pos, compound, neu, neg, color, creationTime) VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE());", (random_identifier, speech.capture, sentiment.vs['pos'], sentiment.vs['compound'], sentiment.vs['neu'], sentiment.vs['neg'], ifttt.color))
+# cursor.execute("INSERT INTO test (speech, pos, compound, neu, neg, color, creationTime) VALUES (?, ?, ?, ?, ?, ?, GETDATE());", (speech.capture, sentiment.vs['pos'], sentiment.vs['compound'], sentiment.vs['neu'], sentiment.vs['neg'], ifttt.color))
+# cursor.execute("INSERT INTO test2 (identifier, speech, pos, compound, neu, neg, color, creationTime) VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE());", (random_identifier, speech.capture, sentiment.vs['pos'], sentiment.vs['compound'], sentiment.vs['neu'], sentiment.vs['neg'], ifttt.color))
 # Un-comment to manually test DB
-# cursor.execute("INSERT INTO test2 (identifier, speech, pos, compound, neu, neg, color, creationTime) VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE());", (random_identifier , 'I am beautiful', 1.0, 0.05, 0.0, 0.0, "green"))
-print("Inserted",cursor.rowcount,"row(s) of data.")
+# cursor.execute("INSERT INTO list (curse_words, time_allowance, curse_threshold, creationTime) VALUES (?, ?, ?, GETDATE());", (random_identifier, 120, 15))
+# print("Inserted",cursor.rowcount,"row(s) of data.")
+
+# Get the latest from the list table
+list_query = "select top 1 * from test order by creationTime desc"
+cursor.execute(list_query)
+curse_fetch = cursor.fetchone()
+curse_list = curse_fetch[0]
+time_allowance = curse_fetch[1]
+curse_threshold = curse_fetch[2]
+
+# Comparing speech to curse words
+capture_list = speech.capture.split()
+curse_count = 0
+
+# Cursing
+for i in capture_list:
+    for j in curse_list:
+        if j == i:
+            curse_count += 1
+            color="blink_red"
+        else:
+            curse_count += 0
+if curse_count == curse_threshold:
+    time_allowance -= 180 # remove 3 mins
+elif curse_count == curse_threshold-1:
+    color="rapid_red"
+    color="red"    
+
+consecutive = 0
+SLS = 1
+
+# Sentiment
+while time_allowance != 0:
+    compound_query = "select avg(compound) from test where creationTime >= dateadd(minute, -3, getdate())"
+    cursor.execute(compound_query)
+    compound_fetch = cursor.fetchone()
+    average_compound = compound_fetch[0]
+
+    if average_compound >= 0.05: # positive
+        time_allowance += 120 # add 2 mins
+    elif average_compound <= -0.05: # negative
+        SLS = 3
+        consecutive += 1
+        time_allowance -= 120 # remove 2 mins
+    else:
+        SLS = 2
+
+    if consecutive/3 == 1:
+        SLS = 3
+    elif consecutive/3 == 2:
+        SLS = 4
+    else:
+        SLS = 5
+
+    time_allowance -= 1 #remove 1 second    
+
+if time_allowance == 0:
+    color="purple"
+    color="turn_off" #turn off lights
+    color="switch_off" #turn off smart plug
+
+if SLS == 2: # Low aggression
+    color = 'yellow'
+elif SLS == 3: # Medium aggression
+    color = 'orange'
+elif SLS == 4: # Medium high aggression
+    color = "red_orange"     
+elif SLS == 5: # Max aggression
+    color = 'red'
+else: # Neutral
+    color = 'green' 
+
+# IFTTT webhook
+url = 'https://maker.ifttt.com/trigger/{}/with/key/NzX9u8NuVPaFWZyqQRhlv'.format(color)
+urllib.request.urlopen(url) 
+
+# Insert some data into table
+cursor.execute("INSERT INTO test2 (identifier, speech, pos, compound, neu, neg, color, creationTime) VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE());", (random_identifier, speech.capture, sentiment.vs['pos'], sentiment.vs['compound'], sentiment.vs['neu'], sentiment.vs['neg'], color))
 
 # Cleanup
 conn.commit()
