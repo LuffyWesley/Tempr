@@ -1,4 +1,5 @@
 import speech_recognition as sr
+import urllib.request
 
 # Initialize recognizer class (for recognizing the speech)
 r = sr.Recognizer()
@@ -11,6 +12,9 @@ try:
     print("A moment of silence, please...")
     with m as source: r.adjust_for_ambient_noise(source) # we only need to calibrate once, before we start listening
     print("Set minimum energy threshold to {}".format(r.energy_threshold))
+    # Blink twice when ready
+    url = 'https://maker.ifttt.com/trigger/{}/with/key/NzX9u8NuVPaFWZyqQRhlv'.format(system_ready)
+    urllib.request.urlopen(url) 
     
     while True:
         print("Say something!")
