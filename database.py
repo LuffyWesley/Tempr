@@ -64,23 +64,23 @@ time_allowance = curse_fetch[1]
 curse_threshold = curse_fetch[2]
 
 # Comparing speech to curse words
-capture_list = speech.capture.split()
+# capture_list = speech.capture.split()
 curse_count = 0
 
 # Cursing
-for i in capture_list:
-    for j in curse_list:
-        if j == i:
-            curse_count += 1
-            color="blink_red"
-        else:
-            curse_count += 0
-if curse_count == curse_threshold:
-    time_allowance -= 180 # remove 3 mins
-    color = "rapid_red"
-elif curse_count == curse_threshold-1:
-    color="rapid_red"
-    color="red"    
+# for i in capture_list:
+#     for j in curse_list:
+#         if j == i:
+#             curse_count += 1
+#             color="blink_red"
+#         else:
+#             curse_count += 0
+# if curse_count == curse_threshold:
+#     time_allowance -= 180 # remove 3 mins
+#     color = "rapid_red"
+# elif curse_count == curse_threshold-1:
+#     color="rapid_red"
+#     color="red"
 
 readings = []
 SLS = 1
@@ -91,6 +91,21 @@ current_time = datetime.now()
 
 # Sentiment
 while current_time < session_end:
+    capture_list = speech.capture.split()
+    for i in capture_list:
+        for j in curse_list:
+            if j == i:
+                curse_count += 1
+                color = "blink_red"
+            else:
+                curse_count += 0
+    if curse_count == curse_threshold:
+        time_allowance -= 180  # remove 3 mins
+        color = "rapid_red"
+    elif curse_count == curse_threshold - 1:
+        color = "rapid_red"
+        color = "red"
+
     compound_query = "select avg(compound) from test where creationTime >= dateadd(minute, -3, getdate())"
     cursor.execute(compound_query)
     compound_fetch = cursor.fetchone()
