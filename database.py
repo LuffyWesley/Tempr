@@ -60,7 +60,7 @@ list_query = "select top 1 * from test order by creationTime desc"
 cursor.execute(list_query)
 curse_fetch = cursor.fetchone()
 curse_list = curse_fetch[0]
-time_allowance_start = curse_fetch[1]
+time_allowance = curse_fetch[1]
 curse_threshold = curse_fetch[2]
 
 # Comparing speech to curse words
@@ -85,8 +85,8 @@ elif curse_count == curse_threshold-1:
 readings = []
 SLS = 1
 
-time_allowance_start_sec = time_allowance_start * 60
-session_end = datetime.now() + datetime.timedelta(seconds = time_allowance_start_sec)
+time_allowance_sec = time_allowance * 60
+session_end = datetime.now() + datetime.timedelta(seconds = time_allowance_sec)
 session_time = datetime.now()
 
 # Sentiment
