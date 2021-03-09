@@ -153,12 +153,6 @@ while current_time < session_end:
         readings.pop(0)
     current_time = datetime.now()
 
-    # Insert some data into table
-    cursor.execute(
-        "INSERT INTO test2 (identifier, speech, pos, compound, neu, neg, color, creationTime) VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE());",
-        (random_identifier, speech.capture, sentiment.vs['pos'], sentiment.vs['compound'], sentiment.vs['neu'],
-         sentiment.vs['neg'], color))
-
     if SLS == 2:  # Low aggression
         color = 'yellow'
     elif SLS == 3:  # Medium aggression
