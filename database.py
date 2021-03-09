@@ -14,14 +14,14 @@ database = ''
 username = ''
 password = ''
 # Un-comment the line below if running in Raspberry Pi
-# dsn = 'rpitestsqlserverdatasource'
+dsn = 'rpitestsqlserverdatasource'
 
 # Un-comment the line below if running code on Mac/PC
 conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+ password)
 
 # Un-comment the next two lines below if running code on Raspberry Pi
-# connString = 'DSN={0};UID={1};PWD={2};DATABASE={3};'.format(dsn,username,password,database)
-# conn = pyodbc.connect(connString)
+connString = 'DSN={0};UID={1};PWD={2};DATABASE={3};'.format(dsn,username,password,database)
+conn = pyodbc.connect(connString)
 
 cursor = conn.cursor()
 
