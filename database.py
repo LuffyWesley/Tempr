@@ -77,6 +77,7 @@ for i in capture_list:
             curse_count += 0
 if curse_count == curse_threshold:
     time_allowance -= 180 # remove 3 mins
+    color = "rapid_red"
 elif curse_count == curse_threshold-1:
     color="rapid_red"
     color="red"    
@@ -92,11 +93,11 @@ while time_allowance != 0:
     average_compound = compound_fetch[0]
 
     if average_compound >= 0.05: # positive
-        time_allowance += 120 # add 2 mins
+        time_allowance += 120 # add 2 mins ## I think this needs to move to when time_allowance == 0 so its only added once?
     elif average_compound <= -0.05: # negative
         SLS = 3
         consecutive += 1
-        time_allowance -= 120 # remove 2 mins
+        time_allowance -= 120 # remove 2 mins ##also needs to be at time_allowance --0
     else:
         SLS = 2
 
