@@ -151,11 +151,11 @@ if current_time >= session_end:
     final_average_compound = final_compound_fetch[0]
 
     if final_average_compound <= -0.01:
-        cursor.execute("INSERT INTO list (time_allowance, creationTime) VALUES (?, GETDATE())", (time_allowance - 120))
+        cursor.execute("INSERT INTO list (time_allowance, creationTime) VALUES (?, GETDATE())", ((time_allowance - 120)/60))
     elif final_average_compund >= 0.01:
-        cursor.execute("INSERT INTO list (time_allowance, creationTime) VALUES (?, GETDATE())", (time_allowance + 120))
+        cursor.execute("INSERT INTO list (time_allowance, creationTime) VALUES (?, GETDATE())", ((time_allowance + 120)/60))
     if curse_count >= curse_threshold:
-        cursor.execute("INSERT INTO list (time_allowance, creationTime) VALUES (?, GETDATE())", (time_allowance - 180))
+        cursor.execute("INSERT INTO list (time_allowance, creationTime) VALUES (?, GETDATE())", ((time_allowance - 180)/60))
 
 if SLS == 2: # Low aggression
     color = 'yellow'
