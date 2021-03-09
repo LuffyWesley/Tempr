@@ -56,7 +56,7 @@ urllib.request.urlopen(url)
 # print("Inserted",cursor.rowcount,"row(s) of data.")
 
 # Get the latest from the list table
-list_query = "select top 1 * from test order by creationTime desc"
+list_query = "select top 1 * from list order by creationTime desc"
 cursor.execute(list_query)
 curse_fetch = cursor.fetchone()
 curse_list = curse_fetch[0]
@@ -87,17 +87,16 @@ SLS = 1
 
 time_allowance_sec = time_allowance * 60
 session_end = datetime.now() + datetime.timedelta(seconds = time_allowance_sec)
-session_time = datetime.now()
+current_time = datetime.now()
 
 # Sentiment
-while session_time < session_end:
+while current_time < session_end:
     compound_query = "select avg(compound) from test where creationTime >= dateadd(minute, -3, getdate())"
     cursor.execute(compound_query)
     compound_fetch = cursor.fetchone()
     average_compound = compound_fetch[0]
 
     if average_compound >= 0.05: # positive
-        time_allowance += 120 # add 2 mins ## I think this needs to move to when time_allowance == 0 so its only added once?
         readings.append("pos")
         if SLS > 1: ## 1 step down for positive behavior
             SLS = SLS - 1
@@ -107,7 +106,6 @@ while session_time < session_end:
     elif average_compound <= -0.05: # negative
         if average_compound <= -0.5: #aggressive negative
             readings.append("aggressive")
-            time_allowance -= 120 # remove 2 mins ##also needs to be at time_allowance == 0
 
             if readings[-3:] == ["aggressive", "aggressive", "aggressive"]:
                 SLS = 5
@@ -126,23 +124,23 @@ while session_time < session_end:
 
     if len(readings) == 4:
         readings.pop(0)
-    session_time = datetime.now()
+    current_time = datetime.now()
 
-if session_time >= session_end:
+if current_time >= session_end:
     color="purple"
     color="turn_off" #turn off lights
     color="switch_off" #turn off smart plug
-    compound_query = "select avg(compound) from test where identifier = random_identifier"
-    cursor.execute(compound_query)
-    compound_fetch = cursor.fetchone()
-    average_compound = compound_fetch[0]
+    final_compound_query = "select avg(compound) from test2 where identifier = '{}';".format(random_identifier)
+    cursor.execute(final_compound_query)
+    final_compound_fetch = cursor.fetchone()
+    final_average_compound = final_compound_fetch[0]
 
-    if average_compound <= -0.01:
-        cursor.execute("INSERT INTO test () VALUES (?)", (time_allowance_start - 120))
-    elif average_compund >= 0.01:
-        cursor.execute("INSERT INTO test () VALUES (?)", (time_allowance_start + 120))
+    if final_average_compound <= -0.01:
+        cursor.execute("INSERT INTO list (time_allowance, creationTime) VALUES (?, GETDATE())", (time_allowance - 120))
+    elif final_average_compund >= 0.01:
+        cursor.execute("INSERT INTO list (time_allowance, creationTime) VALUES (?, GETDATE())", (time_allowance + 120))
     if curse_count >= curse_threshold:
-        cursor.execute("INSERT INTO test () VALUES (?)", (time_allowance_start - 180))
+        cursor.execute("INSERT INTO list (time_allowance, creationTime) VALUES (?, GETDATE())", (time_allowance - 180))
 
 if SLS == 2: # Low aggression
     color = 'yellow'
