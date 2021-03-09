@@ -7,6 +7,7 @@ import random
 import string
 import datetime
 import urllib.request
+from datetime import datetime, timedelta
 
 server = ''
 database = ''
@@ -91,7 +92,7 @@ readings = []
 SLS = 1
 
 time_allowance_sec = time_allowance * 60
-session_end = datetime.now() + datetime.timedelta(seconds = time_allowance_sec)
+session_end = datetime.now() + timedelta(seconds = time_allowance_sec)
 current_time = datetime.now()
 
 # Sentiment
