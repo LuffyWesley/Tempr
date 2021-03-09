@@ -34,7 +34,12 @@ random_identifier = random_string + str(seconds)
 
 # Power on (slow fade from off to green, duration 5 seconds)
 url = 'https://maker.ifttt.com/trigger/{}/with/key/NzX9u8NuVPaFWZyqQRhlv'.format(power_on)
-urllib.request.urlopen(url)   
+urllib.request.urlopen(url)
+
+# IFTTT webhook
+def send_ifttt(color):
+    url = 'https://maker.ifttt.com/trigger/{}/with/key/NzX9u8NuVPaFWZyqQRhlv'.format(color)
+    urllib.request.urlopen(url)
 
 # Un-comment to drop previous table of same name if one exists
 # cursor.execute("DROP TABLE IF EXISTS list;")
@@ -97,14 +102,21 @@ while current_time < session_end:
             if j == i:
                 curse_count += 1
                 color = "blink_red"
+                send_ifttt(color)
             else:
                 curse_count += 0
     if curse_count == curse_threshold:
         time_allowance -= 180  # remove 3 mins
         color = "rapid_red"
+        send_ifttt(color)
+
     elif curse_count == curse_threshold - 1:
         color = "rapid_red"
+        send_ifttt(color)
+        sleep(5)
         color = "red"
+        send_ifttt(color)
+        sleep(5)
 
     compound_query = "select avg(compound) from test where creationTime >= dateadd(minute, -3, getdate())"
     cursor.execute(compound_query)
@@ -141,10 +153,37 @@ while current_time < session_end:
         readings.pop(0)
     current_time = datetime.now()
 
+    # Insert some data into table
+    cursor.execute(
+        "INSERT INTO test2 (identifier, speech, pos, compound, neu, neg, color, creationTime) VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE());",
+        (random_identifier, speech.capture, sentiment.vs['pos'], sentiment.vs['compound'], sentiment.vs['neu'],
+         sentiment.vs['neg'], color))
+
+    if SLS == 2:  # Low aggression
+        color = 'yellow'
+    elif SLS == 3:  # Medium aggression
+        color = 'orange'
+    elif SLS == 4:  # Medium high aggression
+        color = "red_orange"
+    elif SLS == 5:  # Max aggression
+        color = 'red'
+    else:  # Neutral
+        color = 'green'
+    ##send to IFTTT
+    send_ifttt(color)
+
+    # Insert some data into table
+    cursor.execute("INSERT INTO test2 (identifier, speech, pos, compound, neu, neg, color, creationTime) VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE());", (random_identifier, speech.capture, sentiment.vs['pos'], sentiment.vs['compound'], sentiment.vs['neu'], sentiment.vs['neg'], color))
+
 if current_time >= session_end:
     color="purple"
+    send_ifttt(color)
+    sleep(10)
     color="turn_off" #turn off lights
+    send_ifttt(color)
     color="switch_off" #turn off smart plug
+    send_ifttt(color)
+
     final_compound_query = "select avg(compound) from test2 where identifier = '{}';".format(random_identifier)
     cursor.execute(final_compound_query)
     final_compound_fetch = cursor.fetchone()
@@ -157,23 +196,6 @@ if current_time >= session_end:
     if curse_count >= curse_threshold:
         cursor.execute("INSERT INTO list (time_allowance, creationTime) VALUES (?, GETDATE())", ((time_allowance - 180)/60))
 
-if SLS == 2: # Low aggression
-    color = 'yellow'
-elif SLS == 3: # Medium aggression
-    color = 'orange'
-elif SLS == 4: # Medium high aggression
-    color = "red_orange"     
-elif SLS == 5: # Max aggression
-    color = 'red'
-else: # Neutral
-    color = 'green' 
-
-# IFTTT webhook
-url = 'https://maker.ifttt.com/trigger/{}/with/key/NzX9u8NuVPaFWZyqQRhlv'.format(color)
-urllib.request.urlopen(url) 
-
-# Insert some data into table
-cursor.execute("INSERT INTO test2 (identifier, speech, pos, compound, neu, neg, color, creationTime) VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE());", (random_identifier, speech.capture, sentiment.vs['pos'], sentiment.vs['compound'], sentiment.vs['neu'], sentiment.vs['neg'], color))
 
 # Cleanup
 conn.commit()
