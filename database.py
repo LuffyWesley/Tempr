@@ -56,7 +56,7 @@ urllib.request.urlopen(url)
 # print("Inserted",cursor.rowcount,"row(s) of data.")
 
 # Get the latest from the list table
-list_query = "select top 1 * from test order by creationTime desc"
+list_query = "select top 1 * from list order by creationTime desc"
 cursor.execute(list_query)
 curse_fetch = cursor.fetchone()
 curse_list = curse_fetch[0]
@@ -64,55 +64,98 @@ time_allowance = curse_fetch[1]
 curse_threshold = curse_fetch[2]
 
 # Comparing speech to curse words
-capture_list = speech.capture.split()
+# capture_list = speech.capture.split()
 curse_count = 0
 
 # Cursing
-for i in capture_list:
-    for j in curse_list:
-        if j == i:
-            curse_count += 1
-            color="blink_red"
-        else:
-            curse_count += 0
-if curse_count == curse_threshold:
-    time_allowance -= 180 # remove 3 mins
-elif curse_count == curse_threshold-1:
-    color="rapid_red"
-    color="red"    
+# for i in capture_list:
+#     for j in curse_list:
+#         if j == i:
+#             curse_count += 1
+#             color="blink_red"
+#         else:
+#             curse_count += 0
+# if curse_count == curse_threshold:
+#     time_allowance -= 180 # remove 3 mins
+#     color = "rapid_red"
+# elif curse_count == curse_threshold-1:
+#     color="rapid_red"
+#     color="red"
 
-consecutive = 0
+readings = []
 SLS = 1
 
+time_allowance_sec = time_allowance * 60
+session_end = datetime.now() + datetime.timedelta(seconds = time_allowance_sec)
+current_time = datetime.now()
+
 # Sentiment
-while time_allowance != 0:
+while current_time < session_end:
+    capture_list = speech.capture.split()
+    for i in capture_list:
+        for j in curse_list:
+            if j == i:
+                curse_count += 1
+                color = "blink_red"
+            else:
+                curse_count += 0
+    if curse_count == curse_threshold:
+        time_allowance -= 180  # remove 3 mins
+        color = "rapid_red"
+    elif curse_count == curse_threshold - 1:
+        color = "rapid_red"
+        color = "red"
+
     compound_query = "select avg(compound) from test where creationTime >= dateadd(minute, -3, getdate())"
     cursor.execute(compound_query)
     compound_fetch = cursor.fetchone()
     average_compound = compound_fetch[0]
 
     if average_compound >= 0.05: # positive
-        time_allowance += 120 # add 2 mins
+        readings.append("pos")
+        if SLS > 1: ## 1 step down for positive behavior
+            SLS = SLS - 1
+        else:
+            SLS = 1
+
     elif average_compound <= -0.05: # negative
-        SLS = 3
-        consecutive += 1
-        time_allowance -= 120 # remove 2 mins
-    else:
-        SLS = 2
+        if average_compound <= -0.5: #aggressive negative
+            readings.append("aggressive")
 
-    if consecutive/3 == 1:
-        SLS = 3
-    elif consecutive/3 == 2:
-        SLS = 4
-    else:
-        SLS = 5
+            if readings[-3:] == ["aggressive", "aggressive", "aggressive"]:
+                SLS = 5
+            elif readings[-2:] == ["aggressive", "aggressive"]:
+                SLS = 4
+            elif readings[-2:] == ["pos", "aggressive"] and SLS > 2:
+                SLS = 4
+            else:
+                SLS = 3
+        elif average_compound <= -0.05: ##medium_negative
+            readings.append("med_neg")
+            if readings[-3:] == ["med_neg", "med_neg", "med_neg"]:
+                SLS = 3
+            elif SLS == 1:
+                SLS = 2
 
-    time_allowance -= 1 #remove 1 second    
+    if len(readings) == 4:
+        readings.pop(0)
+    current_time = datetime.now()
 
-if time_allowance == 0:
+if current_time >= session_end:
     color="purple"
     color="turn_off" #turn off lights
     color="switch_off" #turn off smart plug
+    final_compound_query = "select avg(compound) from test2 where identifier = '{}';".format(random_identifier)
+    cursor.execute(final_compound_query)
+    final_compound_fetch = cursor.fetchone()
+    final_average_compound = final_compound_fetch[0]
+
+    if final_average_compound <= -0.01:
+        cursor.execute("INSERT INTO list (time_allowance, creationTime) VALUES (?, GETDATE())", ((time_allowance - 120)/60))
+    elif final_average_compund >= 0.01:
+        cursor.execute("INSERT INTO list (time_allowance, creationTime) VALUES (?, GETDATE())", ((time_allowance + 120)/60))
+    if curse_count >= curse_threshold:
+        cursor.execute("INSERT INTO list (time_allowance, creationTime) VALUES (?, GETDATE())", ((time_allowance - 180)/60))
 
 if SLS == 2: # Low aggression
     color = 'yellow'
