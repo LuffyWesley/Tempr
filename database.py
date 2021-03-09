@@ -60,7 +60,7 @@ list_query = "select top 1 * from test order by creationTime desc"
 cursor.execute(list_query)
 curse_fetch = cursor.fetchone()
 curse_list = curse_fetch[0]
-time_allowance = curse_fetch[1]
+time_allowance_start = curse_fetch[1]
 curse_threshold = curse_fetch[2]
 
 # Comparing speech to curse words
@@ -85,8 +85,12 @@ elif curse_count == curse_threshold-1:
 readings = []
 SLS = 1
 
+time_allowance_start_sec = time_allowance_start * 60
+session_end = datetime.now() + datetime.timedelta(seconds = time_allowance_start_sec)
+session_time = datetime.now()
+
 # Sentiment
-while time_allowance != 0:
+while session_time < session_end:
     compound_query = "select avg(compound) from test where creationTime >= dateadd(minute, -3, getdate())"
     cursor.execute(compound_query)
     compound_fetch = cursor.fetchone()
@@ -122,15 +126,23 @@ while time_allowance != 0:
 
     if len(readings) == 4:
         readings.pop(0)
+    session_time = datetime.now()
 
-
-
-    time_allowance -= 1 #remove 1 second    
-
-if time_allowance == 0:
+if session_time >= session_end:
     color="purple"
     color="turn_off" #turn off lights
     color="switch_off" #turn off smart plug
+    compound_query = "select avg(compound) from test where identifier = random_identifier"
+    cursor.execute(compound_query)
+    compound_fetch = cursor.fetchone()
+    average_compound = compound_fetch[0]
+
+    if average_compound <= -0.01:
+        cursor.execute("INSERT INTO test () VALUES (?)", (time_allowance_start - 120))
+    elif average_compund >= 0.01:
+        cursor.execute("INSERT INTO test () VALUES (?)", (time_allowance_start + 120))
+    if curse_count >= curse_threshold:
+        cursor.execute("INSERT INTO test () VALUES (?)", (time_allowance_start - 180))
 
 if SLS == 2: # Low aggression
     color = 'yellow'
