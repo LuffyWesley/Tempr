@@ -82,7 +82,7 @@ elif curse_count == curse_threshold-1:
     color="rapid_red"
     color="red"    
 
-consecutive = 0
+readings = []
 SLS = 1
 
 # Sentiment
@@ -94,19 +94,36 @@ while time_allowance != 0:
 
     if average_compound >= 0.05: # positive
         time_allowance += 120 # add 2 mins ## I think this needs to move to when time_allowance == 0 so its only added once?
-    elif average_compound <= -0.05: # negative
-        SLS = 3
-        consecutive += 1
-        time_allowance -= 120 # remove 2 mins ##also needs to be at time_allowance --0
-    else:
-        SLS = 2
+        readings.append("pos")
+        if SLS > 1: ## 1 step down for positive behavior
+            SLS = SLS - 1
+        else:
+            SLS = 1
 
-    if consecutive/3 == 1:
-        SLS = 3
-    elif consecutive/3 == 2:
-        SLS = 4
-    else:
-        SLS = 5
+    elif average_compound <= -0.05: # negative
+        if average_compound <= -0.5: #aggressive negative
+            readings.append("aggressive")
+            time_allowance -= 120 # remove 2 mins ##also needs to be at time_allowance == 0
+
+            if readings[-3:] == ["aggressive", "aggressive", "aggressive"]:
+                SLS = 5
+            elif readings[-2:] == ["aggressive", "aggressive"]:
+                SLS = 4
+            elif readings[-2:] == ["pos", "aggressive"] and SLS > 2:
+                SLS = 4
+            else:
+                SLS = 3
+        elif average_compound <= -0.05: ##medium_negative
+            readings.append("med_neg")
+            if readings[-3:] == ["med_neg", "med_neg", "med_neg"]:
+                SLS = 3
+            elif SLS == 1:
+                SLS = 2
+
+    if len(readings) == 4:
+        readings.pop(0)
+
+
 
     time_allowance -= 1 #remove 1 second    
 
