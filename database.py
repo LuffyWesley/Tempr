@@ -36,25 +36,6 @@ def send_ifttt(color):
     url = 'https://maker.ifttt.com/trigger/{}/with/key/NzX9u8NuVPaFWZyqQRhlv'.format(color)
     urllib.request.urlopen(url)
 
-# Un-comment to drop previous table of same name if one exists
-# cursor.execute("DROP TABLE IF EXISTS list;")
-# cursor.execute("DROP TABLE IF EXISTS test;")
-# cursor.execute("DROP TABLE IF EXISTS test2;")
-# print("Finished dropping table (if existed).")
-
-# Un-comment to create table
-# cursor.execute("CREATE TABLE list (curse_words NVARCHAR(MAX), time_allowance INT, curse_threshold INT, creationTime smalldatetime)")
-# cursor.execute("CREATE TABLE test (speech NVARCHAR(MAX), pos FLOAT(53), compound FLOAT(53), neu FLOAT(53), neg FLOAT(53), color VARCHAR(50), creationTime smalldatetime)")
-# cursor.execute("CREATE TABLE test2 (identifier NVARCHAR(MAX), speech NVARCHAR(MAX), pos FLOAT(53), compound FLOAT(53), neu FLOAT(53), neg FLOAT(53), color VARCHAR(50), creationTime smalldatetime)")
-# print("Finished creating table.")
-
-# Insert some data into table
-# cursor.execute("INSERT INTO test (speech, pos, compound, neu, neg, color, creationTime) VALUES (?, ?, ?, ?, ?, ?, GETDATE());", (speech.value, sentiment.vs['pos'], sentiment.vs['compound'], sentiment.vs['neu'], sentiment.vs['neg'], ifttt.color))
-# cursor.execute("INSERT INTO test2 (identifier, speech, pos, compound, neu, neg, color, creationTime) VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE());", (random_identifier, speech.value, sentiment.vs['pos'], sentiment.vs['compound'], sentiment.vs['neu'], sentiment.vs['neg'], ifttt.color))
-# Un-comment to manually test DB
-# cursor.execute("INSERT INTO list (curse_words, time_allowance, curse_threshold, creationTime) VALUES (?, ?, ?, GETDATE());", (random_identifier, 120, 15))
-# print("Inserted",cursor.rowcount,"row(s) of data.")
-
 # Get the latest from the list table
 list_query = "select top 1 * from list order by creationTime desc"
 cursor.execute(list_query)
@@ -64,29 +45,12 @@ time_allowance = curse_fetch[1]
 curse_threshold = curse_fetch[2]
 
 # Comparing speech to curse words
-# capture_list = speech.value.split()
 curse_count = 0
-
-# Cursing
-# for i in capture_list:
-#     for j in curse_list:
-#         if j == i:
-#             curse_count += 1
-#             color="blink_red"
-#         else:
-#             curse_count += 0
-# if curse_count == curse_threshold:
-#     time_allowance -= 180 # remove 3 mins
-#     color = "rapid_red"
-# elif curse_count == curse_threshold-1:
-#     color="rapid_red"
-#     color="red"
 
 readings = []
 SLS = 1
 
-# time_allowance_sec = time_allowance * 60
-time_allowance_sec = 10
+time_allowance_sec = time_allowance * 60
 session_end = datetime.datetime.now() + datetime.timedelta(seconds = time_allowance_sec)
 current_time = datetime.datetime.now()
 
