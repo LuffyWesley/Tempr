@@ -1,5 +1,4 @@
 import pyodbc
-# import ifttt
 import sentiment
 import speech
 import time
@@ -32,10 +31,6 @@ length_of_string = 3
 random_string = "".join(random.choice(string.ascii_letters) for i in range(length_of_string))
 random_identifier = random_string + str(seconds)
 
-# Power on (slow fade from off to green, duration 5 seconds)
-url = 'https://maker.ifttt.com/trigger/{}/with/key/NzX9u8NuVPaFWZyqQRhlv'.format(power_on)
-urllib.request.urlopen(url)
-
 # IFTTT webhook
 def send_ifttt(color):
     url = 'https://maker.ifttt.com/trigger/{}/with/key/NzX9u8NuVPaFWZyqQRhlv'.format(color)
@@ -54,8 +49,8 @@ def send_ifttt(color):
 # print("Finished creating table.")
 
 # Insert some data into table
-# cursor.execute("INSERT INTO test (speech, pos, compound, neu, neg, color, creationTime) VALUES (?, ?, ?, ?, ?, ?, GETDATE());", (speech.capture, sentiment.vs['pos'], sentiment.vs['compound'], sentiment.vs['neu'], sentiment.vs['neg'], ifttt.color))
-# cursor.execute("INSERT INTO test2 (identifier, speech, pos, compound, neu, neg, color, creationTime) VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE());", (random_identifier, speech.capture, sentiment.vs['pos'], sentiment.vs['compound'], sentiment.vs['neu'], sentiment.vs['neg'], ifttt.color))
+# cursor.execute("INSERT INTO test (speech, pos, compound, neu, neg, color, creationTime) VALUES (?, ?, ?, ?, ?, ?, GETDATE());", (speech.value, sentiment.vs['pos'], sentiment.vs['compound'], sentiment.vs['neu'], sentiment.vs['neg'], ifttt.color))
+# cursor.execute("INSERT INTO test2 (identifier, speech, pos, compound, neu, neg, color, creationTime) VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE());", (random_identifier, speech.value, sentiment.vs['pos'], sentiment.vs['compound'], sentiment.vs['neu'], sentiment.vs['neg'], ifttt.color))
 # Un-comment to manually test DB
 # cursor.execute("INSERT INTO list (curse_words, time_allowance, curse_threshold, creationTime) VALUES (?, ?, ?, GETDATE());", (random_identifier, 120, 15))
 # print("Inserted",cursor.rowcount,"row(s) of data.")
@@ -69,7 +64,7 @@ time_allowance = curse_fetch[1]
 curse_threshold = curse_fetch[2]
 
 # Comparing speech to curse words
-# capture_list = speech.capture.split()
+# capture_list = speech.value.split()
 curse_count = 0
 
 # Cursing
@@ -90,13 +85,14 @@ curse_count = 0
 readings = []
 SLS = 1
 
-time_allowance_sec = time_allowance * 60
-session_end = datetime.now() + datetime.timedelta(seconds = time_allowance_sec)
-current_time = datetime.now()
+# time_allowance_sec = time_allowance * 60
+time_allowance_sec = 10
+session_end = datetime.datetime.now() + datetime.timedelta(seconds = time_allowance_sec)
+current_time = datetime.datetime.now()
 
 # Sentiment
 while current_time < session_end:
-    capture_list = speech.capture.split()
+    capture_list = speech.value.split()
     for i in capture_list:
         for j in curse_list:
             if j == i:
@@ -113,12 +109,10 @@ while current_time < session_end:
     elif curse_count == curse_threshold - 1:
         color = "rapid_red"
         send_ifttt(color)
-        sleep(5)
         color = "red"
         send_ifttt(color)
-        sleep(5)
 
-    compound_query = "select avg(compound) from test where creationTime >= dateadd(minute, -3, getdate())"
+    compound_query = "select avg(compound) from test where creationTime >= dateadd(minute, -18000, getdate())"
     cursor.execute(compound_query)
     compound_fetch = cursor.fetchone()
     average_compound = compound_fetch[0]
@@ -151,13 +145,7 @@ while current_time < session_end:
 
     if len(readings) == 4:
         readings.pop(0)
-    current_time = datetime.now()
-
-    # Insert some data into table
-    cursor.execute(
-        "INSERT INTO test2 (identifier, speech, pos, compound, neu, neg, color, creationTime) VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE());",
-        (random_identifier, speech.capture, sentiment.vs['pos'], sentiment.vs['compound'], sentiment.vs['neu'],
-         sentiment.vs['neg'], color))
+    current_time = datetime.datetime.now()
 
     if SLS == 2:  # Low aggression
         color = 'yellow'
@@ -173,12 +161,11 @@ while current_time < session_end:
     send_ifttt(color)
 
     # Insert some data into table
-    cursor.execute("INSERT INTO test2 (identifier, speech, pos, compound, neu, neg, color, creationTime) VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE());", (random_identifier, speech.capture, sentiment.vs['pos'], sentiment.vs['compound'], sentiment.vs['neu'], sentiment.vs['neg'], color))
+    cursor.execute("INSERT INTO test2 (identifier, speech, pos, compound, neu, neg, color, creationTime) VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE());", (random_identifier, speech.value, sentiment.vs['pos'], sentiment.vs['compound'], sentiment.vs['neu'], sentiment.vs['neg'], color))
 
 if current_time >= session_end:
     color="purple"
     send_ifttt(color)
-    sleep(10)
     color="turn_off" #turn off lights
     send_ifttt(color)
     color="switch_off" #turn off smart plug
@@ -191,7 +178,7 @@ if current_time >= session_end:
 
     if final_average_compound <= -0.01:
         cursor.execute("INSERT INTO list (time_allowance, creationTime) VALUES (?, GETDATE())", ((time_allowance - 120)/60))
-    elif final_average_compund >= 0.01:
+    elif final_average_compound >= 0.01:
         cursor.execute("INSERT INTO list (time_allowance, creationTime) VALUES (?, GETDATE())", ((time_allowance + 120)/60))
     if curse_count >= curse_threshold:
         cursor.execute("INSERT INTO list (time_allowance, creationTime) VALUES (?, GETDATE())", ((time_allowance - 180)/60))
