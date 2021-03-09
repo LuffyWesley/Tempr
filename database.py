@@ -7,6 +7,7 @@ import random
 import string
 import datetime
 import urllib.request
+from datetime import datetime, timedelta
 
 server = ''
 database = ''
@@ -91,7 +92,7 @@ readings = []
 SLS = 1
 
 time_allowance_sec = time_allowance * 60
-session_end = datetime.now() + datetime.timedelta(seconds = time_allowance_sec)
+session_end = datetime.now() + timedelta(seconds = time_allowance_sec)
 current_time = datetime.now()
 
 # Sentiment
@@ -152,12 +153,6 @@ while current_time < session_end:
     if len(readings) == 4:
         readings.pop(0)
     current_time = datetime.now()
-
-    # Insert some data into table
-    cursor.execute(
-        "INSERT INTO test2 (identifier, speech, pos, compound, neu, neg, color, creationTime) VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE());",
-        (random_identifier, speech.capture, sentiment.vs['pos'], sentiment.vs['compound'], sentiment.vs['neu'],
-         sentiment.vs['neg'], color))
 
     if SLS == 2:  # Low aggression
         color = 'yellow'
