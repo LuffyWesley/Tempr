@@ -8,14 +8,6 @@ m = sr.Microphone()
 # A list
 sentences = []
 
-# Turn plug on
-url = 'https://maker.ifttt.com/trigger/{}/with/key/NzX9u8NuVPaFWZyqQRhlv'.format('plug_on')
-urllib.request.urlopen(url)
-
-# Power on (slow fade from off to green, duration 5 seconds)
-url = 'https://maker.ifttt.com/trigger/{}/with/key/NzX9u8NuVPaFWZyqQRhlv'.format('power_on')
-urllib.request.urlopen(url)
-
 # try:
 #     print("A moment of silence, please...")
 #     with m as source: r.adjust_for_ambient_noise(source) # we only need to calibrate once, before we start listening
@@ -40,16 +32,20 @@ urllib.request.urlopen(url)
 #             print("Uh oh! Couldn't request results from Google Speech Recognition service; {0}".format(e))
 # except KeyboardInterrupt:
 #     pass
-with sr.Microphone() as source:
-    print("Talk")
-    audio_text = r.listen(source)
-    print("Time over, thanks")
 
-# recoginize_() method will throw a request error if the API is unreachable, hence using exception handling    
-    try:
-        # using google speech recognition
-        value = r.recognize_google(audio_text)
-        sentences.append(value)
-        print("Text:" + value)
-    except:
-        print("Sorry, I did not get that")
+def listen(): 
+    sentences = []
+    with sr.Microphone() as source:
+        print("Talk")
+        audio_text = r.listen(source)
+        print("Time over, thanks")
+    
+    # recoginize_() method will throw a request error if the API is unreachable, hence using exception handling    
+        try:
+            # using google speech recognition
+            value = r.recognize_google(audio_text)
+            sentences.append(value)
+            print("Text:" + value)
+            return sentences
+        except:
+            print("Sorry, I did not get that")
