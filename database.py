@@ -74,8 +74,8 @@ while current_time < session_end:
     
     analyzer = SentimentIntensityAnalyzer()
     for words in sentences:
-    vs = analyzer.polarity_scores(words)
-    print("{:-<65} {}".format(words, str(vs)))
+        vs = analyzer.polarity_scores(words)
+        print("{:-<65} {}".format(words, str(vs)))
     
     # Insert some data into table
     cursor.execute("INSERT INTO test2 (identifier, speech, pos, compound, neu, neg, creationTime) VALUES (?, ?, ?, ?, ?, ?, GETDATE());", (random_identifier, value, vs['pos'], vs['compound'], vs['neu'], vs['neg']))
