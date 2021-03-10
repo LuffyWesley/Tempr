@@ -24,6 +24,14 @@ cursor = conn.cursor()
 # Seconds since epoch at GMT
 seconds = time.time()
 
+# Turn plug on
+url = 'https://maker.ifttt.com/trigger/{}/with/key/NzX9u8NuVPaFWZyqQRhlv'.format('plug_on')
+urllib.request.urlopen(url)
+ 
+# Power on (slow fade from off to green, duration 5 seconds)
+url = 'https://maker.ifttt.com/trigger/{}/with/key/NzX9u8NuVPaFWZyqQRhlv'.format('power_on')
+urllib.request.urlopen(url)
+
 # Random unique identifier
 length_of_string = 3
 random_string = "".join(random.choice(string.ascii_letters) for i in range(length_of_string))
