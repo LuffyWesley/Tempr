@@ -104,7 +104,6 @@ while current_time < session_end:
     with sr.Microphone() as source:
         print("Talk")
         audio_text = r.listen(source, phrase_time_limit = 10)
-        #^^after source, phrase_time_limit = 3
         print("Time over, thanks")
            
     # recoginize_() method will throw a request error if the API is unreachable, hence using exception handling    
@@ -141,12 +140,12 @@ while current_time < session_end:
                 curse_count += 1
                 color = "blink_red"
                 print(color)
-                #send_ifttt(color)
+
         if "**" in i:
             curse_count += 1
             color = "blink_red"
             print(color)
-            #send_ifttt(color)
+
     print(curse_count)
     
     if curse_count == curse_threshold:
@@ -235,7 +234,7 @@ while current_time < session_end:
     startTime = round(time.time())
 
 if current_time >= session_end:
-    deathSequence(random_identifier,cursor,time_allowance)
+    deathSequence(random_identifier, cursor, time_allowance)
 
 # Close connection to DB
 cursor.close()
