@@ -8,11 +8,11 @@ import speech_recognition as sr
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 # DB Credentials
-dsn = 'rpitestsqlserverdatasource'
-user = 'tempr.admin@tempr'
-password = 'VQ7_68667BQZ8qDA4R'
-database = 'tempr'
-server = 'tempr.database.windows.net'
+dsn = ''
+user = ''
+password = ''
+database = ''
+server = ''
 
 # Un-comment the next two lines below if running code on Raspberry Pi
 # connString = 'DSN={0};UID={1};PWD={2};DATABASE={3};'.format(dsn,user,password,database)
