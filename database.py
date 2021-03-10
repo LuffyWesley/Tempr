@@ -7,18 +7,12 @@ import string
 import datetime
 import urllib.request
 
-server = ''
-database = ''
-username = ''
-password = ''
-# Un-comment the line below if running in Raspberry Pi
 dsn = 'rpitestsqlserverdatasource'
+user = 'tempr.admin@tempr'
+password = 'VQ7_68667BQZ8qDA4R'
+database = 'tempr'
 
-# Un-comment the line below if running code on Mac/PC
-conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+ password)
-
-# Un-comment the next two lines below if running code on Raspberry Pi
-connString = 'DSN={0};UID={1};PWD={2};DATABASE={3};'.format(dsn,username,password,database)
+connString = 'DSN={0};UID={1};PWD={2};DATABASE={3};'.format(dsn,user,password,database)
 conn = pyodbc.connect(connString)
 
 cursor = conn.cursor()
@@ -56,6 +50,8 @@ current_time = datetime.datetime.now()
 
 # Sentiment
 while current_time < session_end:
+    # Insert some data into table
+    cursor.execute("INSERT INTO test2 (identifier, speech, pos, compound, neu, neg, creationTime) VALUES (?, ?, ?, ?, ?, ?, GETDATE());", (random_identifier, speech.value, sentiment.vs['pos'], sentiment.vs['compound'], sentiment.vs['neu'], sentiment.vs['neg']))
     capture_list = speech.value.split()
     for i in capture_list:
         for j in curse_list:
@@ -76,7 +72,7 @@ while current_time < session_end:
         color = "red"
         send_ifttt(color)
 
-    compound_query = "select avg(compound) from test where creationTime >= dateadd(minute, -18000, getdate())"
+    compound_query = "select avg(compound) from test2 where creationTime >= dateadd(minute, -180, getdate())"
     cursor.execute(compound_query)
     compound_fetch = cursor.fetchone()
     average_compound = compound_fetch[0]
@@ -124,11 +120,10 @@ while current_time < session_end:
     ##send to IFTTT
     send_ifttt(color)
 
-    # Insert some data into table
-    cursor.execute("INSERT INTO test2 (identifier, speech, pos, compound, neu, neg, color, creationTime) VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE());", (random_identifier, speech.value, sentiment.vs['pos'], sentiment.vs['compound'], sentiment.vs['neu'], sentiment.vs['neg'], color))
-
+    
 if current_time >= session_end:
     color="purple"
+    time.sleep(5)
     send_ifttt(color)
     color="turn_off" #turn off lights
     send_ifttt(color)
@@ -141,11 +136,11 @@ if current_time >= session_end:
     final_average_compound = final_compound_fetch[0]
 
     if final_average_compound <= -0.01:
-        cursor.execute("INSERT INTO list (time_allowance, creationTime) VALUES (?, GETDATE())", ((time_allowance - 120)/60))
+        cursor.execute("INSERT INTO time (time_updated, creationTime) VAsLUES (?, GETDATE())", ((time_allowance - 120)/60))
     elif final_average_compound >= 0.01:
-        cursor.execute("INSERT INTO list (time_allowance, creationTime) VALUES (?, GETDATE())", ((time_allowance + 120)/60))
+        cursor.execute("INSERT INTO time (time_updated, creationTime) VALUES (?, GETDATE())", ((time_allowance + 120)/60))
     if curse_count >= curse_threshold:
-        cursor.execute("INSERT INTO list (time_allowance, creationTime) VALUES (?, GETDATE())", ((time_allowance - 180)/60))
+        cursor.execute("INSERT INTO time (time_updated, creationTime) VALUES (?, GETDATE())", ((time_allowance - 180)/60))
 
 
 # Cleanup
