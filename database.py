@@ -38,7 +38,7 @@ def send_ifttt(color):
 list_query = "select top 1 * from list order by creationTime desc"
 cursor.execute(list_query)
 curse_fetch = cursor.fetchone()
-curse_list = curse_fetch[0]
+curse_list = curse_fetch[0].lower()
 time_allowance = curse_fetch[1]
 curse_threshold = curse_fetch[2]
 
@@ -66,7 +66,7 @@ while current_time < session_end:
     # recoginize_() method will throw a request error if the API is unreachable, hence using exception handling    
         try:
             # using google speech recognition
-            value = r.recognize_google(audio_text)
+            value = r.recognize_google(audio_text).lower()
             sentences.append(value)
             print("Text:" + value)
         except:
@@ -166,11 +166,11 @@ if current_time >= session_end:
     final_average_compound = final_compound_fetch[0]
 
     if final_average_compound <= -0.01:
-        cursor.execute("INSERT INTO list (time_allowance, curse_words, curse_threshold, creationTime) VALUES (?, GETDATE())", ((time_allowance - 120)/60), curse_list, curse_threshold)
+        cursor.execute("INSERT INTO list (time_allowance, curse_words, curse_threshold, creationTime) VALUES (?, ?, ?, GETDATE())", ((time_allowance - 120)/60), curse_list, curse_threshold)
     elif final_average_compound >= 0.01:
-        cursor.execute("INSERT INTO list (time_allowance, curse_words, curse_threshold, creationTime) VALUES (?, GETDATE())", ((time_allowance + 120)/60), curse_list, curse_threshold)
+        cursor.execute("INSERT INTO list (time_allowance, curse_words, curse_threshold, creationTime) VALUES (?, ?, ?, GETDATE())", ((time_allowance + 120)/60), curse_list, curse_threshold)
     if curse_count >= curse_threshold:
-        cursor.execute("INSERT INTO list (time_allowance, curse_words, curse_threshold, creationTime) VALUES (?, GETDATE())", ((time_allowance - 180)/60), curse_list, curse_threshold)
+        cursor.execute("INSERT INTO list (time_allowance, curse_words, curse_threshold, creationTime) VALUES (?, ?, ?, GETDATE())", ((time_allowance - 180)/60), curse_list, curse_threshold)
 
 
 # Cleanup
