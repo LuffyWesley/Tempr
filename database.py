@@ -11,10 +11,10 @@ import urllib.request
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 # import speech
 
-dsn = 'rpitestsqlserverdatasource'
-user = 'tempr.admin@tempr'
-password = 'VQ7_68667BQZ8qDA4R'
-database = 'tempr'
+dsn = ''
+user = ''
+password = ''
+database = ''
 
 connString = 'DSN={0};UID={1};PWD={2};DATABASE={3};'.format(dsn,user,password,database)
 conn = pyodbc.connect(connString)
