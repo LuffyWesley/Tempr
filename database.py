@@ -148,8 +148,7 @@ while current_time < session_end:
 
     print(curse_count)
     
-    if curse_count == curse_threshold:
-        time_allowance -= 180  # remove 3 mins
+    if curse_count >= curse_threshold:
         color = "rapid_red"
         print(color)
         send_ifttt(color)
