@@ -1,30 +1,66 @@
 import pyodbc
-import sentiment
-import speech
+# import sentiment
+# import speech
 import time
 import random
 import string
 import datetime
 import urllib.request
+import speech_recognition as sr
+import urllib.request
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
-server = ''
-database = ''
-username = ''
-password = ''
-# Un-comment the line below if running in Raspberry Pi
-# dsn = 'rpitestsqlserverdatasource'
+#end sequence
+def deathSequence(random_identifier,cursor, time_allowance):
+    color="purple"
+    time.sleep(10)
+    send_ifttt(color)
+    color="turn_off" #turn off lights
+    send_ifttt(color)
+    color="switch_off" #turn off smart plug
+    send_ifttt(color)
+    
+    final_compound_query = "select avg(compound) from test2 where identifier = '{}';".format(random_identifier)
+    cursor.execute(final_compound_query)
+    final_compound_fetch = cursor.fetchone()
+    final_average_compound = final_compound_fetch[0]
+    if final_average_compound <= -0.01:
+        time_allowance = (time_allowance - 120)/60
+    
+    elif final_average_compound >= 0.01:
+        time_allowance = (time_allowance + 120)/60
+    
+    if curse_count >= curse_threshold:
+        time_allowance = (time_allowance - 180)/60
+    
+    
+    cursor.execute("INSERT INTO list (time_allowance, curse_words, curse_threshold, creationTime) VALUES (?, ?, ?, GETDATE())", (time_allowance, curse_list, curse_threshold))
 
-# Un-comment the line below if running code on Mac/PC
-conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+ password)
 
-# Un-comment the next two lines below if running code on Raspberry Pi
-# connString = 'DSN={0};UID={1};PWD={2};DATABASE={3};'.format(dsn,username,password,database)
-# conn = pyodbc.connect(connString)
+
+# import speech
+dsn = 'rpitestsqlserverdatasource'
+user = 'tempr.admin@tempr'
+password = 'VQ7_68667BQZ8qDA4R'
+database = 'tempr'
+
+
+
+connString = 'DSN={0};UID={1};PWD={2};DATABASE={3};'.format(dsn,user,password,database)
+conn = pyodbc.connect(connString)
 
 cursor = conn.cursor()
 
 # Seconds since epoch at GMT
 seconds = time.time()
+
+# Turn plug on
+url = 'https://maker.ifttt.com/trigger/{}/with/key/NzX9u8NuVPaFWZyqQRhlv'.format('plug_on')
+urllib.request.urlopen(url)
+# Power on (slow fade from off to green, duration 5 seconds)
+url = 'https://maker.ifttt.com/trigger/{}/with/key/NzX9u8NuVPaFWZyqQRhlv'.format('power_on')
+urllib.request.urlopen(url)
+
 
 # Random unique identifier
 length_of_string = 3
@@ -36,13 +72,20 @@ def send_ifttt(color):
     url = 'https://maker.ifttt.com/trigger/{}/with/key/NzX9u8NuVPaFWZyqQRhlv'.format(color)
     urllib.request.urlopen(url)
 
+
+
+
 # Get the latest from the list table
 list_query = "select top 1 * from list order by creationTime desc"
 cursor.execute(list_query)
 curse_fetch = cursor.fetchone()
-curse_list = curse_fetch[0]
+curse_list = curse_fetch[0].lower()
 time_allowance = curse_fetch[1]
 curse_threshold = curse_fetch[2]
+
+print(time_allowance)
+print(curse_threshold)
+print(curse_list)
 
 # Comparing speech to curse words
 curse_count = 0
@@ -50,38 +93,95 @@ curse_count = 0
 readings = []
 SLS = 1
 
-time_allowance_sec = time_allowance * 60
+#time_allowance_sec = time_allowance * 60
+time_allowance_sec = 200
 session_end = datetime.datetime.now() + datetime.timedelta(seconds = time_allowance_sec)
 current_time = datetime.datetime.now()
 
+startTime = round(time.time())
+
 # Sentiment
 while current_time < session_end:
-    capture_list = speech.value.split()
+    # Initialize recognizer class (for recognizing the speech)
+    r = sr.Recognizer()
+    m = sr.Microphone()
+    sentences = []
+    with sr.Microphone() as source:
+        print("Talk")
+        audio_text = r.listen(source, phrase_time_limit = 10)
+        #^^after source, phrase_time_limit = 3
+        print("Time over, thanks")
+        
+    
+    # recoginize_() method will throw a request error if the API is unreachable, hence using exception handling    
+        try:
+            # using google speech recognition
+            value = r.recognize_google(audio_text).lower()
+            sentences.append(value)
+            print("Text:" + value)
+        except:
+            print("Sorry, I did not get that")
+            continue
+    time1 = round(time.time() * 1000)
+    analyzer = SentimentIntensityAnalyzer()
+    vs = analyzer.polarity_scores(sentences)
+    print("{:-<65} {}".format(' '.join(sentences), str(vs)))
+    time.time_ns() 
+    time2 = round(time.time() * 1000)
+    print((time2 - time1) / 1000.0)
+    
+    # Insert some data into table
+    cursor.execute("INSERT INTO test2 (identifier, speech, pos, compound, neu, neg, creationTime) VALUES (?, ?, ?, ?, ?, ?, GETDATE());", (random_identifier, value, vs['pos'], vs['compound'], vs['neu'], vs['neg']))
+
+    color = None
+    #cursing
+    capture_list = value.split()
     for i in capture_list:
-        for j in curse_list:
+        for j in curse_list.split(", "):
             if j == i:
                 curse_count += 1
                 color = "blink_red"
-                send_ifttt(color)
-            else:
-                curse_count += 0
+                print(color)
+                #send_ifttt(color)
+        if "**" in i:
+            curse_count += 1
+            color = "blink_red"
+            print(color)
+            #send_ifttt(color)
+    print(curse_count)
     if curse_count == curse_threshold:
         time_allowance -= 180  # remove 3 mins
         color = "rapid_red"
         send_ifttt(color)
+        deathSequence(random_identifier,cursor,time_allowance)
+        break
 
     elif curse_count == curse_threshold - 1:
         color = "rapid_red"
         send_ifttt(color)
+        time.sleep(5)
         color = "red"
         send_ifttt(color)
+        color = None
+    
+    if color != None:
+        send_ifttt(color)
 
-    compound_query = "select avg(compound) from test where creationTime >= dateadd(minute, -18000, getdate())"
+    time.sleep(5)
+    
+    endTime = round(time.time())
+    
+    if endTime - startTime < 60:
+        continue
+    
+    compound_query = "select avg(compound) from test2 where creationTime >= dateadd(minute, -1, getdate())"
     cursor.execute(compound_query)
     compound_fetch = cursor.fetchone()
     average_compound = compound_fetch[0]
+    print(average_compound)
 
     if average_compound >= 0.05: # positive
+
         readings.append("pos")
         if SLS > 1: ## 1 step down for positive behavior
             SLS = SLS - 1
@@ -113,39 +213,27 @@ while current_time < session_end:
 
     if SLS == 2:  # Low aggression
         color = 'yellow'
+        print(color)
     elif SLS == 3:  # Medium aggression
         color = 'orange'
+        print(color)
     elif SLS == 4:  # Medium high aggression
         color = "red_orange"
+        print(color)
     elif SLS == 5:  # Max aggression
         color = 'red'
+        print(color)
     else:  # Neutral
         color = 'green'
+        print(color)
     ##send to IFTTT
     send_ifttt(color)
+    startTime = round(time.time())
 
-    # Insert some data into table
-    cursor.execute("INSERT INTO test2 (identifier, speech, pos, compound, neu, neg, color, creationTime) VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE());", (random_identifier, speech.value, sentiment.vs['pos'], sentiment.vs['compound'], sentiment.vs['neu'], sentiment.vs['neg'], color))
-
+    
 if current_time >= session_end:
-    color="purple"
-    send_ifttt(color)
-    color="turn_off" #turn off lights
-    send_ifttt(color)
-    color="switch_off" #turn off smart plug
-    send_ifttt(color)
-
-    final_compound_query = "select avg(compound) from test2 where identifier = '{}';".format(random_identifier)
-    cursor.execute(final_compound_query)
-    final_compound_fetch = cursor.fetchone()
-    final_average_compound = final_compound_fetch[0]
-
-    if final_average_compound <= -0.01:
-        cursor.execute("INSERT INTO list (time_allowance, creationTime) VALUES (?, GETDATE())", ((time_allowance - 120)/60))
-    elif final_average_compound >= 0.01:
-        cursor.execute("INSERT INTO list (time_allowance, creationTime) VALUES (?, GETDATE())", ((time_allowance + 120)/60))
-    if curse_count >= curse_threshold:
-        cursor.execute("INSERT INTO list (time_allowance, creationTime) VALUES (?, GETDATE())", ((time_allowance - 180)/60))
+    deathSequence(random_identifier,cursor,time_allowance)
+ 
 
 
 # Cleanup
