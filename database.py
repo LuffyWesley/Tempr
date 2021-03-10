@@ -141,13 +141,12 @@ while current_time < session_end:
                 color = "blink_red"
                 print(color)
                 #send_ifttt(color)
-            else:
-                curse_count += 0
         if "**" in i:
             curse_count += 1
             color = "blink_red"
             print(color)
             #send_ifttt(color)
+    print(curse_count)
     if curse_count == curse_threshold:
         time_allowance -= 180  # remove 3 mins
         color = "rapid_red"
