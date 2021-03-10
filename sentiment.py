@@ -4,6 +4,8 @@ import speech
 
 ## Text sentiment analysis
 analyzer = SentimentIntensityAnalyzer()
-for sentence in speech.sentences:
-    vs = analyzer.polarity_scores(sentence)
-    print("{:-<65} {}".format(sentence, str(vs)))
+
+def measure_sentiment(sentences):
+    for words in sentences:
+        vs = analyzer.polarity_scores(words)
+        print("{:-<65} {}".format(words, str(vs)))
