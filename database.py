@@ -1,11 +1,15 @@
 import pyodbc
-import sentiment
-import speech
+# import sentiment
+# import speech
 import time
 import random
 import string
 import datetime
 import urllib.request
+import speech_recognition as sr
+import urllib.request
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+# import speech
 
 dsn = 'rpitestsqlserverdatasource'
 user = 'tempr.admin@tempr'
@@ -50,9 +54,34 @@ current_time = datetime.datetime.now()
 
 # Sentiment
 while current_time < session_end:
+    # Initialize recognizer class (for recognizing the speech)
+    r = sr.Recognizer()
+    m = sr.Microphone()
+    sentences = []
+    with sr.Microphone() as source:
+        print("Talk")
+        audio_text = r.listen(source)
+        print("Time over, thanks")
+    
+    # recoginize_() method will throw a request error if the API is unreachable, hence using exception handling    
+        try:
+            # using google speech recognition
+            value = r.recognize_google(audio_text)
+            sentences.append(value)
+            print("Text:" + value)
+        except:
+            print("Sorry, I did not get that")
+    
+    analyzer = SentimentIntensityAnalyzer()
+    for words in sentences:
+    vs = analyzer.polarity_scores(words)
+    print("{:-<65} {}".format(words, str(vs)))
+    
     # Insert some data into table
-    cursor.execute("INSERT INTO test2 (identifier, speech, pos, compound, neu, neg, creationTime) VALUES (?, ?, ?, ?, ?, ?, GETDATE());", (random_identifier, speech.value, sentiment.vs['pos'], sentiment.vs['compound'], sentiment.vs['neu'], sentiment.vs['neg']))
-    capture_list = speech.value.split()
+    cursor.execute("INSERT INTO test2 (identifier, speech, pos, compound, neu, neg, creationTime) VALUES (?, ?, ?, ?, ?, ?, GETDATE());", (random_identifier, value, vs['pos'], vs['compound'], vs['neu'], vs['neg']))
+    
+    #cursing
+    capture_list = value.split()
     for i in capture_list:
         for j in curse_list:
             if j == i:
@@ -69,6 +98,7 @@ while current_time < session_end:
     elif curse_count == curse_threshold - 1:
         color = "rapid_red"
         send_ifttt(color)
+        time.sleep(5)
         color = "red"
         send_ifttt(color)
 
@@ -123,7 +153,7 @@ while current_time < session_end:
     
 if current_time >= session_end:
     color="purple"
-    time.sleep(5)
+    time.sleep(10)
     send_ifttt(color)
     color="turn_off" #turn off lights
     send_ifttt(color)
@@ -136,11 +166,11 @@ if current_time >= session_end:
     final_average_compound = final_compound_fetch[0]
 
     if final_average_compound <= -0.01:
-        cursor.execute("INSERT INTO time (time_updated, creationTime) VAsLUES (?, GETDATE())", ((time_allowance - 120)/60))
+        cursor.execute("INSERT INTO list (time_allowance, curse_words, curse_threshold, creationTime) VALUES (?, GETDATE())", ((time_allowance - 120)/60), curse_list, curse_threshold)
     elif final_average_compound >= 0.01:
-        cursor.execute("INSERT INTO time (time_updated, creationTime) VALUES (?, GETDATE())", ((time_allowance + 120)/60))
+        cursor.execute("INSERT INTO list (time_allowance, curse_words, curse_threshold, creationTime) VALUES (?, GETDATE())", ((time_allowance + 120)/60), curse_list, curse_threshold)
     if curse_count >= curse_threshold:
-        cursor.execute("INSERT INTO time (time_updated, creationTime) VALUES (?, GETDATE())", ((time_allowance - 180)/60))
+        cursor.execute("INSERT INTO list (time_allowance, curse_words, curse_threshold, creationTime) VALUES (?, GETDATE())", ((time_allowance - 180)/60), curse_list, curse_threshold)
 
 
 # Cleanup
