@@ -44,6 +44,8 @@ user = 'tempr.admin@tempr'
 password = 'VQ7_68667BQZ8qDA4R'
 database = 'tempr'
 
+
+
 connString = 'DSN={0};UID={1};PWD={2};DATABASE={3};'.format(dsn,user,password,database)
 conn = pyodbc.connect(connString)
 
@@ -106,7 +108,7 @@ while current_time < session_end:
     sentences = []
     with sr.Microphone() as source:
         print("Talk")
-        audio_text = r.listen(source)
+        audio_text = r.listen(source, phrase_time_limit = 10)
         #^^after source, phrase_time_limit = 3
         print("Time over, thanks")
         
