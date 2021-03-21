@@ -8,7 +8,7 @@ import speech_recognition as sr
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 # DB Credentials
-dsn = ''
+dsn = 'rpitestsqlserverdatasource'
 user = ''
 password = ''
 database = ''
