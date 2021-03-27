@@ -1,4 +1,3 @@
-# Tempr
 ## Statement of Problem
 Cyberbullying during multiplayer video game sessions leads to negative impacts in adolescents like lower self-esteem, poor grades, and poor relational patterns. Unfortunately, cyberbullying has been on the rise now more than ever due to COVID-19 drawing more kids to digital platforms for extended periods of time.
 
@@ -8,6 +7,11 @@ Cyberbullying during multiplayer video game sessions leads to negative impacts i
 It would be valuable to create an inexpensive tool that recognizes anger levels and gently brings awareness to the user of their mental state. The tool would implement light color therapy in order to help the user cool down while verbally or visually suggesting they take a short break from the activity, or other feedback depending on context (gaming, driving, heated discussions among couples, childcare, etc.). 
 
 * [Youtube Video](https://youtu.be/QFAw6btepRQ)
+
+## Functionality
+![](images/architecture.png)
+![](images/flow.png)
+![](images/algo.png)
 
 # Hardware Requirements
 * [Raspberry Pi 4](https://www.raspberrypi.org/products/raspberry-pi-4-model-b/)
