@@ -7,7 +7,8 @@ Cyberbullying during multiplayer video game sessions leads to negative impacts i
 ## Design Objectives
 It would be valuable to create an inexpensive tool that recognizes anger levels and gently brings awareness to the user of their mental state. The tool would implement light color therapy in order to help the user cool down while verbally or visually suggesting they take a short break from the activity, or other feedback depending on context (gaming, driving, heated discussions among couples, childcare, etc.). 
 
-[Youtube Video](https://youtu.be/QFAw6btepRQ)
+* [Youtube Video](https://youtu.be/QFAw6btepRQ)
+
 # Hardware Requirements
 * [Raspberry Pi 4](https://www.raspberrypi.org/products/raspberry-pi-4-model-b/)
 * [ReSpeaker 4-Mic Array for Raspberry Pi](https://www.seeedstudio.com/ReSpeaker-4-Mic-Array-for-Raspberry-Pi.html)
