@@ -1,10 +1,20 @@
 ## Statement of Problem
-Cyberbullying during multiplayer video game sessions leads to negative impacts in adolescents like lower self-esteem, poor grades, and poor relational patterns. Unfortunately, cyberbullying has been on the rise now more than ever due to COVID-19 drawing more kids to digital platforms for extended periods of time.
+Aggressive behavior triggered by stressful situations in which people have little to no control can be very difficult to mediate. Recurring aggressive behavior may have long-term consequences such as irritability, restlessness, and an impact on an individual’s mood and/or relationships.
+
+COVID-19 forced people to search for available social outlets during times of lockdown and social distancing, allowing video game playing to hit all-time peaks in usage and popularity among family and friends. Where there are gamers, there is, naturally, an abundance of “toxic” gamers, who may show aggression towards teammates. Constant harassment from these toxic players can furthermore cause depression in others playing with them.
 
 ![](images/example.png)
 
-## Design Objectives
-It would be valuable to create an inexpensive tool that recognizes anger levels and gently brings awareness to the user of their mental state. The tool would implement light color therapy in order to help the user cool down while verbally or visually suggesting they take a short break from the activity, or other feedback depending on context (gaming, driving, heated discussions among couples, childcare, etc.). 
+## Solution
+Tempr functions as an awareness tool for both parents with young gamers and for early adolescents. The goal is to minimize verbal aggression and explicit language while helping children and parents recognize inappropriate behavior during gameplay.
+
+The current implementation of Tempr measures how toxic a player is towards others and provides real-time feedback via smart home LEDs mounted behind a TV as well as a time management function that increases or decreases gaming time based on previous positive/negative behavior. Parents can also configure a list of bad words they don’t want their child(ren) saying and Tempr will track if the words are used, again providing real-time feedback and longer-term consequences.
+
+The technology behind Tempr can be integrated to games for more feedback options such as providing players with in-game currency for positive behavior and putting a player on time-out for a set duration once they reach a certain threshold.
+
+Ultimately, we hope to discourage children from expressing aggressive behavior towards other players (either through their own self-awareness or through parental oversight) and reduce toxicity in gaming environments.
+
+While our primary focus group for this tool is gamers, there could be a much wider range of applications for Tempr. This solution could prove useful during serious arguments between couples and family members, and even help drivers become aware of road rage situations. This technology could further provide aggression awareness in elderly care facilities where residents have difficulty communicating, as well as child daycare’s and schools.
 
 * [Youtube Video](https://youtu.be/QFAw6btepRQ)
 
