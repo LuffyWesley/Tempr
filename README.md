@@ -1,3 +1,9 @@
+# PETRA 2021
+This project has been accepted to the [PETRA Conference 2021](https://petrae.org/): The 14th PErvasive Technologies Related to Assistive Environments Conference.
+
+* [ACM Article](https://camps.aptaracorp.com/ACM_PMS/PMS/ACM/PETRA2021/110/c59067b2-b2a4-11eb-8d84-166a08e17233/OUT/petra2021-110.html)
+* [PETRA Video Submission](https://youtu.be/ZPJPqirDt7U)
+
 ## Statement of Problem
 Aggressive behavior triggered by stressful situations in which people have little to no control can be very difficult to mediate. Recurring aggressive behavior may have long-term consequences such as irritability, restlessness, and an impact on an individual’s mood and/or relationships.
 
